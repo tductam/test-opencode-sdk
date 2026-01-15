@@ -1,0 +1,9 @@
+{
+  "name": "opencode",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@opencode-ai/sdk": "^1.0.0"
+  }
+}
