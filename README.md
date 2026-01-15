@@ -1,78 +1,104 @@
-## Install
+# OpenCode
+
+## Cài đặt
+
 ```bash
-cd test-opencode-sdk
-npm install
+npm install @opencode-ai/sdk
 ```
 
-## Run Opencode Serve
-```bash
-cd path/to/project
-opencode serve
-```
-## Usage
+## Cách dùng
+
+### Gửi prompt
 
 ```bash
-node opencode-tool.js [options] "prompt/input"
-```
-
-## Options
-
-| Tùy chọn | Mô tả |
-| :--- | :--- |
-| `-p, --port <number>` | Port của server (mặc định: `4096`) |
-| `--host <string>` | Host của server (mặc định: `127.0.0.1`) |
-| `--provider <string>` | Provider ID (mặc định: `myprovider`) |
-| `-m, --model <string>` | Model ID (mặc định: `GPT-4o`) |
-| `--new` | Tạo session mới (bỏ qua session cũ) |
-| `--list` | Liệt kê tất cả sessions đã lưu |
-| `--delete` | Xóa session của server được chỉ định |
-| `--clear` | Xóa tất cả sessions |
-| `-h, --help` | Hiển thị trợ giúp |
-
-## Ví dụ
-
-**Gửi prompt đến server mặc định (port 4096):**
-```bash
+# Dùng session gần nhất (hoặc tạo mới nếu chưa có)
 node opencode-tool.js "Hello, AI!"
+
+# Tạo session mới
+node opencode-tool.js --new "Bắt đầu project mới"
+
+# Dùng session cụ thể
+node opencode-tool.js -s ses_abc123 "Tiếp tục conversation"
 ```
 
-**Gửi prompt đến server khác (project khác):**
-```bash
-node opencode-tool.js -p 4097 "Phân tích code"
-```
+### Quản lý sessions
 
-**Tạo session mới:**
 ```bash
-node opencode-tool.js --new "Bắt đầu conversation mới"
-```
-
-**Quản lý sessions:**
-```bash
+# Liệt kê tất cả sessions
 node opencode-tool.js --list
-node opencode-tool.js --delete -p 4096
-node opencode-tool.js --clear
+
+# Xem messages của session
+node opencode-tool.js --messages -s ses_abc123
+
+# Đổi tên session
+node opencode-tool.js --rename "My Project" -s ses_abc123
+
+# Xóa session
+node opencode-tool.js --delete -s ses_abc123
 ```
 
-## Multi-project Workflow
+### Options
 
-Giả lập môi trường làm việc với nhiều dự án cùng lúc:
+| Option | Mô tả |
+|--------|-------|
+| `-s, --session <id>` | Chọn session theo ID |
+| `--new` | Tạo session mới |
+| `--list` | Liệt kê sessions |
+| `--messages` | Xem messages (yêu cầu `-s`) |
+| `--rename <title>` | Đổi tên session (yêu cầu `-s`) |
+| `--delete` | Xóa session (yêu cầu `-s`) |
+| `-p, --port <num>` | Port server (mặc định: 4096) |
+| `--host <host>` | Host server (mặc định: 127.0.0.1) |
+| `-m, --model <id>` | Model ID (mặc định: GPT-4o) |
+| `--provider <id>` | Provider ID (mặc định: myprovider) |
 
-**1. Terminal 1: Serve project A trên port 4096**
+## Multi-project workflow
+
 ```bash
+# Terminal 1: Serve project A
 cd D:\ProjectA && opencode serve --port 4096
-```
 
-**2. Terminal 2: Serve project B trên port 4097**
-```bash
+# Terminal 2: Serve project B
 cd D:\ProjectB && opencode serve --port 4097
-```
 
-**3. Gửi prompt đến project A**
-```bash
+# Gửi prompt đến project A
 node opencode-tool.js -p 4096 "Làm việc với Project A"
-```
 
-**4. Gửi prompt đến project B**
-```bash
+# Gửi prompt đến project B
 node opencode-tool.js -p 4097 "Làm việc với Project B"
 ```
+
+## Sử dụng như module
+
+```javascript
+import { 
+  sendToOpenCode, 
+  listSessions, 
+  createSession 
+} from "./opencode-tool.js";
+
+// Gửi prompt
+const result = await sendToOpenCode({
+  input: "Hello!",
+  port: 4096,
+});
+console.log(result.textResponse);
+
+// Liệt kê sessions
+const client = createClient("127.0.0.1", 4096);
+const sessions = await listSessions(client);
+```
+
+## API Reference
+
+| Function | Mô tả |
+|----------|-------|
+| `sendToOpenCode(options)` | Gửi prompt |
+| `createClient(host, port)` | Tạo client |
+| `listSessions(client)` | Lấy danh sách sessions |
+| `getSession(client, id)` | Lấy session theo ID |
+| `createSession(client, title)` | Tạo session mới |
+| `deleteSession(client, id)` | Xóa session |
+| `renameSession(client, id, title)` | Đổi tên session |
+| `getSessionMessages(client, id)` | Lấy messages |
+| `resolveSession(client, id, forceNew)` | Smart session selection |
