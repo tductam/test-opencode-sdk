@@ -1,4 +1,10 @@
-# Run Opencode Serve
+## Install
+```bash
+cd test-opencode-sdk
+npm install
+```
+
+## Run Opencode Serve
 ```bash
 cd path/to/project
 opencode serve
